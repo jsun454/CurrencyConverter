@@ -1,7 +1,9 @@
 package com.example.jeffrey.currencyconverter
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.widget.EditText
@@ -57,9 +59,10 @@ class MainActivity : AppCompatActivity() {
     private fun setSingleEvent(mainGrid: LinearLayout) {
         for(i in 0 until mainGrid.childCount) {
             val linearLayout: LinearLayout = mainGrid.getChildAt(i) as LinearLayout
-            linearLayout.setOnClickListener {
+            linearLayout.setOnClickListener {// TODO: write a long click listener which pops up a menu {change currency | delete}
                 Toast.makeText(this@MainActivity, "Click!", Toast.LENGTH_SHORT).show() /*test*/
             }
+            // TODO: write a text watcher that updates currency values when an edit text is edited
         }
     }
 
@@ -74,7 +77,7 @@ class MainActivity : AppCompatActivity() {
             /*for((key, value) in currencyRates) {
                 // TODO: save rates to file to use in case there's no wifi/data or getting live rates doesn't work for some reason
             }*/
-        } catch (e: Exception) { // TODO: see what happens when you run the app with no wifi/data
+        } catch (e: Exception) { // TODO: handle the error that happens when you run the app with no wifi/data
             Log.d("Jeffrey Sun", "Error: " + e.toString())
         }
     }
@@ -118,9 +121,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateDisplay() {
         Log.d("Jeffrey Sun", "3") // test
-        // TODO: make updateDisplay hide the linearLayouts of entry rows with empty "" currencies
-        // TODO: make updateDisplay hide the editText of the entry row with "add" as the currency
-        // TODO: make updateDisplay show any hidden linearLayouts/editTexts for normal currencies
         for (i in 1..MAX_NUM_CURRENCIES) {
             val currencyID = resources.getIdentifier("currency$i", "id", packageName)
             val currencyEntry: TextView = findViewById(currencyID)
@@ -129,6 +129,20 @@ class MainActivity : AppCompatActivity() {
             val valueID = resources.getIdentifier("value$i", "id", packageName)
             val valueEntry: EditText = findViewById(valueID)
             valueEntry.setText(String.format(Locale.getDefault(), "%.2f", userCurrencyValueList[i - 1]))
+            valueEntry.inputType = InputType.TYPE_CLASS_NUMBER
+
+            val linearLayout: LinearLayout = mainGrid.getChildAt(i - 1) as LinearLayout
+            when {
+                currencyEntry.text == "" -> linearLayout.visibility = View.GONE
+                currencyEntry.text == ADD_CURRENCY_TEXT -> {
+                    linearLayout.visibility = View.VISIBLE
+                    valueEntry.visibility = View.GONE
+                }
+                else -> {
+                    linearLayout.visibility = View.VISIBLE
+                    valueEntry.visibility = View.VISIBLE
+                }
+            }
         }
     }
 }
