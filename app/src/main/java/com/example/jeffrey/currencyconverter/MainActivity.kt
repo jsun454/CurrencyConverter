@@ -1,9 +1,10 @@
 package com.example.jeffrey.currencyconverter
 
-import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.EditText
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         initES.execute {
             getCurrencyRates()
             getSavedCurrencyList()
-
+            setInputSettings()
             updateCurrencyList()
             updateCurrencyValues(0)
             this@MainActivity.runOnUiThread {
@@ -62,7 +63,6 @@ class MainActivity : AppCompatActivity() {
             linearLayout.setOnClickListener {// TODO: write a long click listener which pops up a menu {change currency | delete}
                 Toast.makeText(this@MainActivity, "Click!", Toast.LENGTH_SHORT).show() /*test*/
             }
-            // TODO: write a text watcher that updates currency values when an edit text is edited
         }
     }
 
@@ -89,8 +89,43 @@ class MainActivity : AppCompatActivity() {
         userCurrencyValueList[0] = BigDecimal(DEFAULT_VALUE)
     }
 
+    private fun setInputSettings() {
+        for(i in 0 until MAX_NUM_CURRENCIES) {
+            val valueID = resources.getIdentifier("value$i", "id", packageName)
+            val valueEntry: EditText = findViewById(valueID)
+            valueEntry.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL // TODO: make sure this works
+            valueEntry.addTextChangedListener(object : TextWatcher {
+                var ignoreChange: Boolean = false
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable) {
+                    if(ignoreChange) {
+                        return
+                    }
+                    ignoreChange = true
+                    when {
+                        s.toString().replace(".", "").replace("0", "").isEmpty() -> userCurrencyValueList[i] = BigDecimal(0)
+                        s.indexOf('.') != s.lastIndexOf('.') -> {
+                            while(s.indexOf('.') != s.lastIndexOf('.')) {
+                                s.delete(s.lastIndexOf('.'), s.lastIndexOf('.') + 1)
+                            } // TODO: make sure this condition can actually be reached if the user presses '.' a bunch of times
+                            userCurrencyValueList[i] = BigDecimal(s.toString())
+                        }
+                        else -> userCurrencyValueList[i] = BigDecimal(s.toString())
+                    }
+                    if (userCurrencyList[i] == "" || userCurrencyList[i] == ADD_CURRENCY_TEXT) {
+                        updateDisplay(i)
+                    } else {
+                        updateCurrencyValues(i)
+                        updateDisplay()
+                    }
+                    ignoreChange = false
+                }
+            })
+        }
+    }
+
     private fun updateCurrencyList() {
-        Log.d("Jeffrey Sun", "1") // test
         var nextCurrencyIndex = 0
         for(i in 0 until userCurrencyList.size) {
             if(userCurrencyList[i] != "" && userCurrencyList[i] != ADD_CURRENCY_TEXT) {
@@ -109,7 +144,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateCurrencyValues(referenceIndex: Int) {
-        Log.d("Jeffrey Sun", "2") // test
         val referenceRate = currencyRates[standardCurrency + userCurrencyList[referenceIndex]].toString().toBigDecimal()
         for (i in 0 until userCurrencyValueList.size) {
             if (userCurrencyList[i] != "" && userCurrencyList[i] != ADD_CURRENCY_TEXT) {
@@ -119,19 +153,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateDisplay() {
-        Log.d("Jeffrey Sun", "3") // test
-        for (i in 1..MAX_NUM_CURRENCIES) {
-            val currencyID = resources.getIdentifier("currency$i", "id", packageName)
+    private fun updateDisplay(index: Int = -1) {
+        for (i in 0 until MAX_NUM_CURRENCIES) {
+            val targetIndex = if(index == -1) {
+                i
+            } else {
+                index
+            }
+            val currencyID = resources.getIdentifier("currency$targetIndex", "id", packageName)
             val currencyEntry: TextView = findViewById(currencyID)
-            currencyEntry.text = userCurrencyList[i - 1]
+            currencyEntry.text = userCurrencyList[targetIndex]
 
-            val valueID = resources.getIdentifier("value$i", "id", packageName)
+            val valueID = resources.getIdentifier("value$targetIndex", "id", packageName)
             val valueEntry: EditText = findViewById(valueID)
-            valueEntry.setText(String.format(Locale.getDefault(), "%.2f", userCurrencyValueList[i - 1]))
-            valueEntry.inputType = InputType.TYPE_CLASS_NUMBER
+            valueEntry.setText(String.format(Locale.getDefault(), "%.2f", userCurrencyValueList[targetIndex]))
 
-            val linearLayout: LinearLayout = mainGrid.getChildAt(i - 1) as LinearLayout
+            val linearLayout: LinearLayout = mainGrid.getChildAt(targetIndex) as LinearLayout
             when {
                 currencyEntry.text == "" -> linearLayout.visibility = View.GONE
                 currencyEntry.text == ADD_CURRENCY_TEXT -> {
@@ -142,6 +179,9 @@ class MainActivity : AppCompatActivity() {
                     linearLayout.visibility = View.VISIBLE
                     valueEntry.visibility = View.VISIBLE
                 }
+            }
+            if(index != -1) {
+                return
             }
         }
     }
