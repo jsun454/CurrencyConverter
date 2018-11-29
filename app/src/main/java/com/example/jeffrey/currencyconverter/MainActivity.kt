@@ -27,11 +27,13 @@ const val ADD_CURRENCY_TEXT = "Add(+)"
 const val DEFAULT_CURRENCY_A = "USD"
 const val DEFAULT_CURRENCY_B = "EUR"
 const val DEFAULT_VALUE = 1
+const val CURRENCY_FORMAT = "%.2f"
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainGrid: LinearLayout
     private lateinit var standardCurrency: String
+    private var ignoreProgramChange: Boolean = false
     private var userCurrencyList = Array(MAX_NUM_CURRENCIES) {""}
     private var userCurrencyValueList = Array<BigDecimal>(MAX_NUM_CURRENCIES) {BigDecimal.valueOf(0)}
     private val currencyRates = HashMap<String, Any>()
@@ -99,19 +101,28 @@ class MainActivity : AppCompatActivity() {
                 override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
-                    if(ignoreChange) {
+                    if(ignoreProgramChange || ignoreChange) {
+                        Log.d("Jeffrey", "Line 105: " + i.toString() + ", ignored")
                         return
                     }
+                    Log.d("Jeffrey", "Line 108: " + i.toString() + ", not ignored")
                     ignoreChange = true
-                    when {
-                        s.toString().replace(".", "").replace("0", "").isEmpty() -> userCurrencyValueList[i] = BigDecimal(0)
-                        s.indexOf('.') != s.lastIndexOf('.') -> {
-                            while(s.indexOf('.') != s.lastIndexOf('.')) {
-                                s.delete(s.lastIndexOf('.'), s.lastIndexOf('.') + 1)
-                            } // TODO: make sure this condition can actually be reached if the user presses '.' a bunch of times
-                            userCurrencyValueList[i] = BigDecimal(s.toString())
+                    try {
+                        when {
+                            s.toString().replace(".", "").replace("0", "").isEmpty() -> userCurrencyValueList[i] =
+                                    BigDecimal(0)
+                            s.indexOf('.') != s.lastIndexOf('.') -> {
+                                while (s.indexOf('.') != s.lastIndexOf('.')) {
+                                    s.delete(s.lastIndexOf('.'), s.lastIndexOf('.') + 1)
+                                } // TODO: make sure this condition can actually be reached if the user presses '.' a bunch of times
+                                userCurrencyValueList[i] = String.format(CURRENCY_FORMAT, BigDecimal(s.toString())).toBigDecimal()
+                            }
+                            else -> { // TODO: when the decimal thing is implemented, this and the condition above can be combined as one else ->
+                                userCurrencyValueList[i] = String.format(CURRENCY_FORMAT, BigDecimal(s.toString())).toBigDecimal()
+                            }
                         }
-                        else -> userCurrencyValueList[i] = BigDecimal(s.toString())
+                    }catch(e: Exception) {
+                        Log.d("Jeffrey", e.toString())
                     }
                     if (userCurrencyList[i] == "" || userCurrencyList[i] == ADD_CURRENCY_TEXT) {
                         updateDisplay(i)
@@ -146,14 +157,16 @@ class MainActivity : AppCompatActivity() {
     private fun updateCurrencyValues(referenceIndex: Int) {
         val referenceRate = currencyRates[standardCurrency + userCurrencyList[referenceIndex]].toString().toBigDecimal()
         for (i in 0 until userCurrencyValueList.size) {
-            if (userCurrencyList[i] != "" && userCurrencyList[i] != ADD_CURRENCY_TEXT) {
+            if (i != referenceIndex && userCurrencyList[i] != "" && userCurrencyList[i] != ADD_CURRENCY_TEXT) {
                 val currencyRate = currencyRates[standardCurrency + userCurrencyList[i]].toString().toBigDecimal()
-                userCurrencyValueList[i] = userCurrencyValueList[referenceIndex] / referenceRate * currencyRate
+                userCurrencyValueList[i] = String.format(CURRENCY_FORMAT, userCurrencyValueList[referenceIndex] / referenceRate * currencyRate).toBigDecimal()
+                Log.d("Jeffrey", "Line 164: $i, " + userCurrencyValueList[i].toString())
             }
         }
     }
 
     private fun updateDisplay(index: Int = -1) {
+        ignoreProgramChange = true
         for (i in 0 until MAX_NUM_CURRENCIES) {
             val targetIndex = if(index == -1) {
                 i
@@ -166,7 +179,7 @@ class MainActivity : AppCompatActivity() {
 
             val valueID = resources.getIdentifier("value$targetIndex", "id", packageName)
             val valueEntry: EditText = findViewById(valueID)
-            valueEntry.setText(String.format(Locale.getDefault(), "%.2f", userCurrencyValueList[targetIndex]))
+            valueEntry.setText(String.format(Locale.getDefault(), CURRENCY_FORMAT, userCurrencyValueList[targetIndex]))
 
             val linearLayout: LinearLayout = mainGrid.getChildAt(targetIndex) as LinearLayout
             when {
@@ -184,5 +197,6 @@ class MainActivity : AppCompatActivity() {
                 return
             }
         }
+        ignoreProgramChange = false
     }
 }
