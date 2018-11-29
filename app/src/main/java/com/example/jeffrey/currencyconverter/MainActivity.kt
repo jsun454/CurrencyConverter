@@ -13,7 +13,9 @@ import android.widget.TextView
 import android.widget.Toast
 import org.json.JSONObject
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.net.URL
+import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -27,7 +29,6 @@ const val ADD_CURRENCY_TEXT = "Add(+)"
 const val DEFAULT_CURRENCY_A = "USD"
 const val DEFAULT_CURRENCY_B = "EUR"
 const val DEFAULT_VALUE = 1
-const val CURRENCY_FORMAT = "%.2f"
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private var userCurrencyList = Array(MAX_NUM_CURRENCIES) {""}
     private var userCurrencyValueList = Array<BigDecimal>(MAX_NUM_CURRENCIES) {BigDecimal.valueOf(0)}
     private val currencyRates = HashMap<String, Any>()
+    private val currencyFormat = DecimalFormat("0.00")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,10 +117,12 @@ class MainActivity : AppCompatActivity() {
                                 while (s.indexOf('.') != s.lastIndexOf('.')) {
                                     s.delete(s.lastIndexOf('.'), s.lastIndexOf('.') + 1)
                                 } // TODO: make sure this condition can actually be reached if the user presses '.' a bunch of times
-                                userCurrencyValueList[i] = String.format(CURRENCY_FORMAT, BigDecimal(s.toString())).toBigDecimal()
+                                currencyFormat.roundingMode = RoundingMode.DOWN
+                                userCurrencyValueList[i] = currencyFormat.format(BigDecimal(s.toString())).toBigDecimal()
                             }
                             else -> { // TODO: when the decimal thing is implemented, this and the condition above can be combined as one else ->
-                                userCurrencyValueList[i] = String.format(CURRENCY_FORMAT, BigDecimal(s.toString())).toBigDecimal()
+                                currencyFormat.roundingMode = RoundingMode.DOWN
+                                userCurrencyValueList[i] = currencyFormat.format(BigDecimal(s.toString())).toBigDecimal()
                             }
                         }
                     }catch(e: Exception) {
@@ -159,7 +163,8 @@ class MainActivity : AppCompatActivity() {
         for (i in 0 until userCurrencyValueList.size) {
             if (i != referenceIndex && userCurrencyList[i] != "" && userCurrencyList[i] != ADD_CURRENCY_TEXT) {
                 val currencyRate = currencyRates[standardCurrency + userCurrencyList[i]].toString().toBigDecimal()
-                userCurrencyValueList[i] = String.format(CURRENCY_FORMAT, userCurrencyValueList[referenceIndex] / referenceRate * currencyRate).toBigDecimal()
+                currencyFormat.roundingMode = RoundingMode.HALF_UP
+                userCurrencyValueList[i] = currencyFormat.format(userCurrencyValueList[referenceIndex] / referenceRate * currencyRate).toBigDecimal()
                 Log.d("Jeffrey", "Line 164: $i, " + userCurrencyValueList[i].toString())
             }
         }
@@ -179,7 +184,8 @@ class MainActivity : AppCompatActivity() {
 
             val valueID = resources.getIdentifier("value$targetIndex", "id", packageName)
             val valueEntry: EditText = findViewById(valueID)
-            valueEntry.setText(String.format(Locale.getDefault(), CURRENCY_FORMAT, userCurrencyValueList[targetIndex]))
+            currencyFormat.roundingMode = RoundingMode.UNNECESSARY
+            valueEntry.setText(currencyFormat.format(userCurrencyValueList[targetIndex]))
 
             val linearLayout: LinearLayout = mainGrid.getChildAt(targetIndex) as LinearLayout
             when {
