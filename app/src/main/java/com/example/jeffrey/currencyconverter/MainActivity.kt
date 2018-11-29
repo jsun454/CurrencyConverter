@@ -19,10 +19,10 @@ import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.math.min
 
 const val BASE_URL = "http://apilayer.net/api/"
 const val LIVE_RATES_ENDPOINT = "live"
-const val CURRENCY_LIST_ENDPOINT = "list" // maybe won't need this if the link w/ rates already has all the currencies
 const val ACCESS_KEY = "00898df57dadc0ab15e93afe5cc9ff10"
 const val MAX_NUM_CURRENCIES = 10
 const val ADD_CURRENCY_TEXT = "Add(+)"
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         for(i in 0 until mainGrid.childCount) {
             val linearLayout: LinearLayout = mainGrid.getChildAt(i) as LinearLayout
             linearLayout.setOnClickListener {// TODO: write a long click listener which pops up a menu {change currency | delete}
-                Toast.makeText(this@MainActivity, "Click!", Toast.LENGTH_SHORT).show() /*test*/
+                Toast.makeText(this@MainActivity, "Click!", Toast.LENGTH_SHORT).show() // TODO: delete or replace with actual click event
             }
         }
     }
@@ -97,43 +97,46 @@ class MainActivity : AppCompatActivity() {
         for(i in 0 until MAX_NUM_CURRENCIES) {
             val valueID = resources.getIdentifier("value$i", "id", packageName)
             val valueEntry: EditText = findViewById(valueID)
-            valueEntry.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL // TODO: make sure this works
+            valueEntry.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             valueEntry.addTextChangedListener(object : TextWatcher {
                 var ignoreChange: Boolean = false
-                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable) {
+                var cursorIndex: Int = 1
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
                     if(ignoreProgramChange || ignoreChange) {
-                        Log.d("Jeffrey", "Line 105: " + i.toString() + ", ignored")
                         return
                     }
-                    Log.d("Jeffrey", "Line 108: " + i.toString() + ", not ignored")
-                    ignoreChange = true
-                    try {
-                        when {
-                            s.toString().replace(".", "").replace("0", "").isEmpty() -> userCurrencyValueList[i] =
-                                    BigDecimal(0)
-                            s.indexOf('.') != s.lastIndexOf('.') -> {
-                                while (s.indexOf('.') != s.lastIndexOf('.')) {
-                                    s.delete(s.lastIndexOf('.'), s.lastIndexOf('.') + 1)
-                                } // TODO: make sure this condition can actually be reached if the user presses '.' a bunch of times
-                                currencyFormat.roundingMode = RoundingMode.DOWN
-                                userCurrencyValueList[i] = currencyFormat.format(BigDecimal(s.toString())).toBigDecimal()
-                            }
-                            else -> { // TODO: when the decimal thing is implemented, this and the condition above can be combined as one else ->
-                                currencyFormat.roundingMode = RoundingMode.DOWN
-                                userCurrencyValueList[i] = currencyFormat.format(BigDecimal(s.toString())).toBigDecimal()
-                            }
-                        }
-                    }catch(e: Exception) {
-                        Log.d("Jeffrey", e.toString())
+                    cursorIndex = valueEntry.selectionStart
+                }
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                    if(ignoreProgramChange || ignoreChange) {
+                        return
                     }
+                    cursorIndex += count - before
+                    if(count > before) {
+                        cursorIndex = min(cursorIndex, s.length - 1)
+                        if(s[0] == '0' && (start == 0 || start == 1)) {
+                            cursorIndex--
+                        }
+                    } else if(count < before) {
+                        if(s[0] == '.' && start == 0) {
+                            cursorIndex++
+                        }
+                    }
+                }
+                override fun afterTextChanged(s: Editable) {
+                    if(ignoreProgramChange || ignoreChange) {
+                        return
+                    }
+                    ignoreChange = true
+                    currencyFormat.roundingMode = RoundingMode.DOWN
+                    userCurrencyValueList[i] = currencyFormat.format(BigDecimal(s.toString())).toBigDecimal()
                     if (userCurrencyList[i] == "" || userCurrencyList[i] == ADD_CURRENCY_TEXT) {
                         updateDisplay(i)
                     } else {
                         updateCurrencyValues(i)
                         updateDisplay()
                     }
+                    valueEntry.setSelection(cursorIndex)
                     ignoreChange = false
                 }
             })
@@ -165,7 +168,6 @@ class MainActivity : AppCompatActivity() {
                 val currencyRate = currencyRates[standardCurrency + userCurrencyList[i]].toString().toBigDecimal()
                 currencyFormat.roundingMode = RoundingMode.HALF_UP
                 userCurrencyValueList[i] = currencyFormat.format(userCurrencyValueList[referenceIndex] / referenceRate * currencyRate).toBigDecimal()
-                Log.d("Jeffrey", "Line 164: $i, " + userCurrencyValueList[i].toString())
             }
         }
     }
