@@ -6,11 +6,9 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
+import android.view.SubMenu
 import android.view.View
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import org.json.JSONObject
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -64,8 +62,56 @@ class MainActivity : AppCompatActivity() {
     private fun setSingleEvent(mainGrid: LinearLayout) {
         for(i in 0 until mainGrid.childCount) {
             val linearLayout: LinearLayout = mainGrid.getChildAt(i) as LinearLayout
-            linearLayout.setOnClickListener {// TODO: write a long click listener which pops up a menu {change currency | delete}
-                Toast.makeText(this@MainActivity, "Click!", Toast.LENGTH_SHORT).show() // TODO: delete or replace with actual click event
+            linearLayout.setOnClickListener {
+                if(userCurrencyList[i] == ADD_CURRENCY_TEXT) {
+                    userCurrencyList[i] = DEFAULT_CURRENCY_A
+                    userCurrencyValueList[i] = BigDecimal(DEFAULT_VALUE)
+                    updateCurrencyList()
+                    updateCurrencyValues(0)
+                    updateDisplay()
+                }
+            }
+            linearLayout.setOnLongClickListener {
+                if(userCurrencyList[i] != ADD_CURRENCY_TEXT) {
+                    /*val popup = PopupMenu(linearLayout.context, linearLayout)
+                    popup.inflate(R.menu.popup_menu)
+                    popup.setOnMenuItemClickListener { item ->
+                        if(userCurrencyList[i] != ADD_CURRENCY_TEXT) {
+                            when(item.itemId) {
+                                R.id.changeCurrencyButton -> {
+                                    Toast.makeText(this@MainActivity, "Change currency!", Toast.LENGTH_SHORT).show()
+                                }
+                                R.id.removeCurrencyButton -> {
+                                    userCurrencyList[i] = ""
+                                    updateCurrencyList()
+                                    updateDisplay()
+                                }
+                            }
+                        }
+                        true
+                    }*/
+                    /* METHOD 1 ABOVE | METHOD 2 BELOW */
+                    // TODO: see if above method is better for showing a list of all the currencies; if it isn't, delete it
+                    PopupMenu(linearLayout.context, linearLayout).run {
+                        menuInflater.inflate(R.menu.popup_menu, menu)
+                        setOnMenuItemClickListener { item ->
+                            when (item.itemId) {
+                                R.id.changeCurrencyButton -> {
+                                    Toast.makeText(this@MainActivity, "Change currency!", Toast.LENGTH_SHORT).show()
+                                    // TODO: show list of all the currencies (either in a submenu or in a separate view entirely)
+                                }
+                                R.id.removeCurrencyButton -> {
+                                    userCurrencyList[i] = ""
+                                    updateCurrencyList()
+                                    updateDisplay()
+                                }
+                            }
+                            true
+                        }
+                        show()
+                    }
+                }
+                true
             }
         }
     }
