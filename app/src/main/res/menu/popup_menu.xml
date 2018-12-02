@@ -5,7 +5,15 @@
 
     <item android:id="@+id/changeCurrencyButton"
           android:title="Change Currency"
-          tools:ignore="HardcodedText"/>
+          tools:ignore="HardcodedText">
+
+          <menu>
+              <item
+                  android:id="@+id/currencyPlaceholder"
+                  android:title="Placeholder">
+              </item>
+          </menu>
+    </item>
 
     <item android:id="@+id/removeCurrencyButton"
           android:title="Delete"

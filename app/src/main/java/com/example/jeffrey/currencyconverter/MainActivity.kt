@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Menu.NONE
 import android.view.SubMenu
 import android.view.View
 import android.widget.*
@@ -17,6 +18,7 @@ import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.math.max
 import kotlin.math.min
 
 const val BASE_URL = "http://apilayer.net/api/"
@@ -72,37 +74,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             linearLayout.setOnLongClickListener {
-                if(userCurrencyList[i] != ADD_CURRENCY_TEXT) {
-                    /*val popup = PopupMenu(linearLayout.context, linearLayout)
-                    popup.inflate(R.menu.popup_menu)
-                    popup.setOnMenuItemClickListener { item ->
-                        if(userCurrencyList[i] != ADD_CURRENCY_TEXT) {
+                if( userCurrencyList[i] != ADD_CURRENCY_TEXT) {
+                    PopupMenu(linearLayout.context, linearLayout).run {
+                        menuInflater.inflate(R.menu.popup_menu, menu)
+                        setOnMenuItemClickListener { item ->
                             when(item.itemId) {
                                 R.id.changeCurrencyButton -> {
-                                    Toast.makeText(this@MainActivity, "Change currency!", Toast.LENGTH_SHORT).show()
+                                    createCurrencyMenu(item.subMenu)
                                 }
                                 R.id.removeCurrencyButton -> {
                                     userCurrencyList[i] = ""
                                     updateCurrencyList()
                                     updateDisplay()
                                 }
-                            }
-                        }
-                        true
-                    }*/
-                    /* METHOD 1 ABOVE | METHOD 2 BELOW */
-                    // TODO: see if above method is better for showing a list of all the currencies; if it isn't, delete it
-                    PopupMenu(linearLayout.context, linearLayout).run {
-                        menuInflater.inflate(R.menu.popup_menu, menu)
-                        setOnMenuItemClickListener { item ->
-                            when (item.itemId) {
-                                R.id.changeCurrencyButton -> {
-                                    Toast.makeText(this@MainActivity, "Change currency!", Toast.LENGTH_SHORT).show()
-                                    // TODO: show list of all the currencies (either in a submenu or in a separate view entirely)
-                                }
-                                R.id.removeCurrencyButton -> {
-                                    userCurrencyList[i] = ""
-                                    updateCurrencyList()
+                                else -> {
+                                    userCurrencyList[i] = item.title.toString()
+                                    updateCurrencyValues(0) // TODO: update to currency user last chose
+                                    // TODO: if this was the last choice, then its value should just stay the same
                                     updateDisplay()
                                 }
                             }
@@ -117,7 +105,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getCurrencyRates() {
-        // TODO: maybe change this so it only updates if it's been a certain amount of time since the last update (like 1 day)
+        // TODO: maybe change this so it only updates if it's been a certain amount of time since the last update (like 6 hrs)
         try {
             standardCurrency = JSONObject(URL("$BASE_URL$LIVE_RATES_ENDPOINT?access_key=$ACCESS_KEY").readText())["source"].toString()
             val jsonRates = JSONObject(JSONObject(URL("$BASE_URL$LIVE_RATES_ENDPOINT?access_key=$ACCESS_KEY").readText())["quotes"].toString())
@@ -127,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             /*for((key, value) in currencyRates) {
                 // TODO: save rates to file to use in case there's no wifi/data or getting live rates doesn't work for some reason
             }*/
-        } catch (e: Exception) { // TODO: handle the error that happens when you run the app with no wifi/data
+        } catch(e: Exception) { // TODO: handle the error that happens when you run the app with no wifi/data
             Log.d("Jeffrey Sun", "Error: " + e.toString())
         }
     }
@@ -147,41 +135,33 @@ class MainActivity : AppCompatActivity() {
             valueEntry.addTextChangedListener(object : TextWatcher {
                 var ignoreChange: Boolean = false
                 var cursorIndex: Int = 1
+
                 override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                    if(ignoreProgramChange || ignoreChange) {
-                        return
-                    }
+                    if(ignoreProgramChange || ignoreChange) return
                     cursorIndex = valueEntry.selectionStart
                 }
+
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    if(ignoreProgramChange || ignoreChange) {
-                        return
-                    }
+                    if(ignoreProgramChange || ignoreChange) return
                     cursorIndex += count - before
                     if(count > before) {
+                        if(s[0] == '0' && (start == 0 || start == 1)) cursorIndex--
                         cursorIndex = min(cursorIndex, s.length - 1)
-                        if(s[0] == '0' && (start == 0 || start == 1)) {
-                            cursorIndex--
-                        }
                     } else if(count < before) {
-                        if(s[0] == '.' && start == 0) {
-                            cursorIndex++
-                        }
+                        if(s.isNotEmpty() && s[0] == '.' && start == 0) cursorIndex++
+                        else if(s.isNotEmpty() && s[0] == '0' && !s.contains('.')) cursorIndex--
+                        cursorIndex = max(0, cursorIndex)
                     }
                 }
+
                 override fun afterTextChanged(s: Editable) {
-                    if(ignoreProgramChange || ignoreChange) {
-                        return
-                    }
+                    if(ignoreProgramChange || ignoreChange) return
                     ignoreChange = true
+                    if(s.isEmpty()) s.insert(0, "0")
                     currencyFormat.roundingMode = RoundingMode.DOWN
                     userCurrencyValueList[i] = currencyFormat.format(BigDecimal(s.toString())).toBigDecimal()
-                    if (userCurrencyList[i] == "" || userCurrencyList[i] == ADD_CURRENCY_TEXT) {
-                        updateDisplay(i)
-                    } else {
-                        updateCurrencyValues(i)
-                        updateDisplay()
-                    }
+                    updateCurrencyValues(i)
+                    updateDisplay()
                     valueEntry.setSelection(cursorIndex)
                     ignoreChange = false
                 }
@@ -198,34 +178,26 @@ class MainActivity : AppCompatActivity() {
             }
         }
         while(nextCurrencyIndex < userCurrencyList.size) {
-            userCurrencyList[nextCurrencyIndex] = if (nextCurrencyIndex == 0 || !(userCurrencyList[nextCurrencyIndex - 1] == ADD_CURRENCY_TEXT || userCurrencyList[nextCurrencyIndex - 1] == "")) {
-                ADD_CURRENCY_TEXT
-            } else {
-                ""
-            }
+            userCurrencyList[nextCurrencyIndex] = (if(nextCurrencyIndex == 0 || !(userCurrencyList[nextCurrencyIndex - 1] == ADD_CURRENCY_TEXT || userCurrencyList[nextCurrencyIndex - 1] == "")) ADD_CURRENCY_TEXT else "")
             userCurrencyValueList[nextCurrencyIndex++] = BigDecimal.valueOf(0)
         }
     }
 
     private fun updateCurrencyValues(referenceIndex: Int) {
         val referenceRate = currencyRates[standardCurrency + userCurrencyList[referenceIndex]].toString().toBigDecimal()
-        for (i in 0 until userCurrencyValueList.size) {
-            if (i != referenceIndex && userCurrencyList[i] != "" && userCurrencyList[i] != ADD_CURRENCY_TEXT) {
+        for(i in 0 until userCurrencyValueList.size) {
+            if(i != referenceIndex && userCurrencyList[i] != "" && userCurrencyList[i] != ADD_CURRENCY_TEXT) {
                 val currencyRate = currencyRates[standardCurrency + userCurrencyList[i]].toString().toBigDecimal()
                 currencyFormat.roundingMode = RoundingMode.HALF_UP
-                userCurrencyValueList[i] = currencyFormat.format(userCurrencyValueList[referenceIndex] / referenceRate * currencyRate).toBigDecimal()
+                userCurrencyValueList[i] = currencyFormat.format(userCurrencyValueList[referenceIndex].divide(referenceRate, currencyFormat.maximumFractionDigits + referenceRate.precision() + currencyRate.precision() + 2, RoundingMode.HALF_UP).multiply(currencyRate)).toBigDecimal()
             }
         }
     }
 
     private fun updateDisplay(index: Int = -1) {
         ignoreProgramChange = true
-        for (i in 0 until MAX_NUM_CURRENCIES) {
-            val targetIndex = if(index == -1) {
-                i
-            } else {
-                index
-            }
+        for(i in 0 until MAX_NUM_CURRENCIES) {
+            val targetIndex = if(index == -1) i else index
             val currencyID = resources.getIdentifier("currency$targetIndex", "id", packageName)
             val currencyEntry: TextView = findViewById(currencyID)
             currencyEntry.text = userCurrencyList[targetIndex]
@@ -247,10 +219,18 @@ class MainActivity : AppCompatActivity() {
                     valueEntry.visibility = View.VISIBLE
                 }
             }
-            if(index != -1) {
-                return
-            }
+            if(index != -1) return
         }
         ignoreProgramChange = false
+    }
+
+    private fun createCurrencyMenu(menu: SubMenu?) {
+        if(menu != null) {
+            menu.clear()
+            menu.clearHeader()
+            currencyRates.forEach { (key, _) ->
+                menu.add(NONE, NONE, NONE, key.subSequence(DEFAULT_CURRENCY_A.length, key.length))
+            }
+        }
     }
 }
