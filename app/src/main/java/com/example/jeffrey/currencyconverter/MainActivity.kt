@@ -1,5 +1,7 @@
 package com.example.jeffrey.currencyconverter
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
@@ -23,7 +25,10 @@ import kotlin.math.min
 
 const val BASE_URL = "http://apilayer.net/api/"
 const val LIVE_RATES_ENDPOINT = "live"
+//const val CURRENCY_LIST_ENDPOINT = "list" // TODO: pull the full currency names from here to display in the currency-select menu
 const val ACCESS_KEY = "00898df57dadc0ab15e93afe5cc9ff10"
+const val SAVED_RATES_FILE = "savedRates.txt" // TODO: can change
+const val SAVED_USER_LIST_FILE = "savedUserList" // TODO: can change (not sure if .xml extension is needed
 const val MAX_NUM_CURRENCIES = 10
 const val ADD_CURRENCY_TEXT = "Add(+)"
 const val DEFAULT_CURRENCY_A = "USD"
@@ -69,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                     userCurrencyList[i] = DEFAULT_CURRENCY_A
                     userCurrencyValueList[i] = BigDecimal(DEFAULT_VALUE)
                     updateCurrencyList()
-                    updateCurrencyValues(0)
+                    updateCurrencyValues(0) // TODO: update to currency value user last changed if possible
                     updateDisplay()
                 }
             }
@@ -89,9 +94,10 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 else -> {
                                     userCurrencyList[i] = item.title.toString()
-                                    updateCurrencyValues(0) // TODO: update to currency user last chose
-                                    // TODO: if this was the last choice, then its value should just stay the same
+                                    updateCurrencyValues(0) // TODO: update to currency value user last changed if possible
+                                    // TODO: if this was the one the user last changed, then its value should stay the same
                                     updateDisplay()
+                                    saveCurrencyList()
                                 }
                             }
                             true
@@ -112,6 +118,9 @@ class MainActivity : AppCompatActivity() {
             for(key in jsonRates.keys()) {
                 currencyRates[key] = jsonRates.get(key) as Any
             }
+            //Log.d("Jeffrey", filesDir.toString())
+            //val os: FileOutputStream = openFileOutput(SAVED_RATES_FILE, Context.MODE_PRIVATE)
+            // TODO: figure out how to use internal storage (read/write) to store key(string)-value(also probably string) pairs
             /*for((key, value) in currencyRates) {
                 // TODO: save rates to file to use in case there's no wifi/data or getting live rates doesn't work for some reason
             }*/
@@ -121,9 +130,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getSavedCurrencyList() {
-        // TODO: make this check if there is a file that contains a saved currency list first, before defaulting to USD and EUR
-        userCurrencyList[0] = DEFAULT_CURRENCY_A
-        userCurrencyList[1] = DEFAULT_CURRENCY_B
+        val userList: SharedPreferences = getSharedPreferences(SAVED_USER_LIST_FILE, Context.MODE_PRIVATE)
+        if(userList.contains("currency0") && userList.getString("currency0", "") != "") {
+            for(i in 0 until MAX_NUM_CURRENCIES) {
+                if(userList.getString("currency$i", "") != "") userCurrencyList[i] = userList.getString("currency$i", null)
+            }
+        } else {
+            userCurrencyList[0] = DEFAULT_CURRENCY_A
+            userCurrencyList[1] = DEFAULT_CURRENCY_B
+        }
         userCurrencyValueList[0] = BigDecimal(DEFAULT_VALUE)
     }
 
@@ -181,6 +196,7 @@ class MainActivity : AppCompatActivity() {
             userCurrencyList[nextCurrencyIndex] = (if(nextCurrencyIndex == 0 || !(userCurrencyList[nextCurrencyIndex - 1] == ADD_CURRENCY_TEXT || userCurrencyList[nextCurrencyIndex - 1] == "")) ADD_CURRENCY_TEXT else "")
             userCurrencyValueList[nextCurrencyIndex++] = BigDecimal.valueOf(0)
         }
+        saveCurrencyList()
     }
 
     private fun updateCurrencyValues(referenceIndex: Int) {
@@ -232,5 +248,14 @@ class MainActivity : AppCompatActivity() {
                 menu.add(NONE, NONE, NONE, key.subSequence(DEFAULT_CURRENCY_A.length, key.length))
             }
         }
+    }
+
+    private fun saveCurrencyList() {
+        val userList: SharedPreferences.Editor = getSharedPreferences(SAVED_USER_LIST_FILE, Context.MODE_PRIVATE).edit()
+        for(i in 0 until MAX_NUM_CURRENCIES) {
+            if (userCurrencyList[i] == ADD_CURRENCY_TEXT) userList.putString("currency$i", "")
+            else userList.putString("currency$i", userCurrencyList[i])
+        }
+        userList.apply()
     }
 }

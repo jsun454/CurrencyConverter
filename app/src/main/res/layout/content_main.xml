@@ -24,7 +24,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="1">
+            android:weightSum="1"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/currency0"
@@ -54,7 +55,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="1">
+            android:weightSum="1"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/currency1"
@@ -84,7 +86,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1">
+                android:weightSum="1"
+                android:visibility="gone">
 
             <TextView
                     android:id="@+id/currency2"
@@ -114,7 +117,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1">
+                android:weightSum="1"
+                android:visibility="gone">
 
             <TextView
                     android:id="@+id/currency3"
@@ -144,7 +148,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1">
+                android:weightSum="1"
+                android:visibility="gone">
 
             <TextView
                     android:id="@+id/currency4"
@@ -174,7 +179,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1">
+                android:weightSum="1"
+                android:visibility="gone">
 
             <TextView
                     android:id="@+id/currency5"
@@ -204,7 +210,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1">
+                android:weightSum="1"
+                android:visibility="gone">
 
             <TextView
                     android:id="@+id/currency6"
@@ -234,7 +241,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1">
+                android:weightSum="1"
+                android:visibility="gone">
 
             <TextView
                     android:id="@+id/currency7"
@@ -264,7 +272,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1">
+                android:weightSum="1"
+                android:visibility="gone">
 
             <TextView
                     android:id="@+id/currency8"
@@ -294,7 +303,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1">
+                android:weightSum="1"
+                android:visibility="gone">
 
             <TextView
                     android:id="@+id/currency9"
