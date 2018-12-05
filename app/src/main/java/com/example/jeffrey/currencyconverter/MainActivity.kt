@@ -3,6 +3,7 @@ package com.example.jeffrey.currencyconverter
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.InputType
@@ -27,18 +28,19 @@ const val BASE_URL = "http://apilayer.net/api/"
 const val LIVE_RATES_ENDPOINT = "live"
 //const val CURRENCY_LIST_ENDPOINT = "list" // TODO: pull the full currency names from here to display in the currency-select menu
 const val ACCESS_KEY = "00898df57dadc0ab15e93afe5cc9ff10"
-const val SAVED_RATES_FILE = "savedRates.txt" // TODO: can change
-const val SAVED_USER_LIST_FILE = "savedUserList" // TODO: can change (not sure if .xml extension is needed
+const val SAVED_RATES_FILE = "savedRates.txt"
+const val SAVED_USER_LIST_FILE = "savedUserList"
 const val MAX_NUM_CURRENCIES = 10
 const val ADD_CURRENCY_TEXT = "Add(+)"
 const val DEFAULT_CURRENCY_A = "USD"
 const val DEFAULT_CURRENCY_B = "EUR"
 const val DEFAULT_VALUE = 1
+const val DELAY_TIME: Long = 5000
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainGrid: LinearLayout
-    private lateinit var standardCurrency: String
+    private var standardCurrency: String = DEFAULT_CURRENCY_A
     private var ignoreProgramChange: Boolean = false
     private var userCurrencyList = Array(MAX_NUM_CURRENCIES) {""}
     private var userCurrencyValueList = Array<BigDecimal>(MAX_NUM_CURRENCIES) {BigDecimal.valueOf(0)}
@@ -111,21 +113,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getCurrencyRates() {
-        // TODO: maybe change this so it only updates if it's been a certain amount of time since the last update (like 6 hrs)
+        // TODO: maybe change this so it only updates if it's been a certain amount of time since the last update (like 3 hrs)
         try {
             standardCurrency = JSONObject(URL("$BASE_URL$LIVE_RATES_ENDPOINT?access_key=$ACCESS_KEY").readText())["source"].toString()
             val jsonRates = JSONObject(JSONObject(URL("$BASE_URL$LIVE_RATES_ENDPOINT?access_key=$ACCESS_KEY").readText())["quotes"].toString())
             for(key in jsonRates.keys()) {
                 currencyRates[key] = jsonRates.get(key) as Any
             }
-            //Log.d("Jeffrey", filesDir.toString())
-            //val os: FileOutputStream = openFileOutput(SAVED_RATES_FILE, Context.MODE_PRIVATE)
-            // TODO: figure out how to use internal storage (read/write) to store key(string)-value(also probably string) pairs
-            /*for((key, value) in currencyRates) {
-                // TODO: save rates to file to use in case there's no wifi/data or getting live rates doesn't work for some reason
-            }*/
-        } catch(e: Exception) { // TODO: handle the error that happens when you run the app with no wifi/data
-            Log.d("Jeffrey Sun", "Error: " + e.toString())
+            saveCurrencyRates()
+        } catch(e: Exception) {
+            Log.e("Jeffrey", "Error: " + e.toString())
+            if(applicationContext.getFileStreamPath(SAVED_RATES_FILE).exists()) {
+                openFileInput(SAVED_RATES_FILE).use {
+                    while (it.read() != -1) {
+                        var key = ""
+                        var value = ""
+                        val breakFlag = (-2).toByte()
+                        while (true) {
+                            val next = it.read()
+                            if (next.toByte() == breakFlag || next == -1) break
+                            key += next.toChar()
+                        }
+                        while (true) {
+                            val next = it.read()
+                            if (next.toByte() == breakFlag || next == -1) break
+                            value += next.toChar()
+                        }
+                        currencyRates[key] = value
+                    }
+                    it.close()
+                }
+            } else {
+                this@MainActivity.runOnUiThread {
+                    Toast.makeText(this@MainActivity, "Rates unavailable. Retrying in ${DELAY_TIME / 1000}s.", Toast.LENGTH_SHORT).show()
+                }
+                SystemClock.sleep(DELAY_TIME)
+                getCurrencyRates()
+            }
         }
     }
 
@@ -247,6 +271,16 @@ class MainActivity : AppCompatActivity() {
             currencyRates.forEach { (key, _) ->
                 menu.add(NONE, NONE, NONE, key.subSequence(DEFAULT_CURRENCY_A.length, key.length))
             }
+        }
+    }
+
+    private fun saveCurrencyRates() {
+        openFileOutput(SAVED_RATES_FILE, Context.MODE_PRIVATE).use {
+            for((key, value) in currencyRates) {
+                val breakFlag = byteArrayOf((-2).toByte())
+                it.write( breakFlag + key.toByteArray() + breakFlag + value.toString().toByteArray() + breakFlag)
+            }
+            it.close()
         }
     }
 
