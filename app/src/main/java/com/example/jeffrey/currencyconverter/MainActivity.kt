@@ -31,7 +31,7 @@ const val ACCESS_KEY = "00898df57dadc0ab15e93afe5cc9ff10"
 const val SAVED_RATES_FILE = "savedRates.txt"
 const val SAVED_USER_LIST_FILE = "savedUserList"
 const val MAX_NUM_CURRENCIES = 10
-const val ADD_CURRENCY_TEXT = "Add(+)"
+const val ADD_CURRENCY_TEXT = "Add [+]"
 const val DEFAULT_CURRENCY_A = "USD"
 const val DEFAULT_CURRENCY_B = "EUR"
 const val DEFAULT_VALUE = 1
@@ -85,9 +85,22 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             linearLayout.setOnLongClickListener {
-                if(userCurrencyList[i] != ADD_CURRENCY_TEXT) { // TODO: add_currency_text also has a long-click listener (new xml, delete all button)
-                    PopupMenu(linearLayout.context, linearLayout).run {
-                        menuInflater.inflate(R.menu.popup_menu, menu)
+                PopupMenu(linearLayout.context, linearLayout).run {
+                    if(userCurrencyList[i] == ADD_CURRENCY_TEXT) {
+                        menuInflater.inflate(R.menu.clear_menu, menu)
+                        setOnMenuItemClickListener { item ->
+                            if(item.itemId == R.id.clearAllButton) {
+                                for(j in 0 until MAX_NUM_CURRENCIES) {
+                                    userCurrencyList[j] = ""
+                                }
+                                updateCurrencyList()
+                                updateDisplay()
+                                lastUserChangedCurrency = 0
+                            }
+                            true
+                        }
+                    } else {
+                        menuInflater.inflate(R.menu.currency_menu, menu)
                         setOnMenuItemClickListener { item ->
                             when(item.itemId) {
                                 R.id.changeCurrencyButton -> {
@@ -112,8 +125,8 @@ class MainActivity : AppCompatActivity() {
                             }
                             true
                         }
-                        show()
                     }
+                    show()
                 }
                 true
             }
