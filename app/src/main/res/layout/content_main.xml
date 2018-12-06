@@ -18,7 +18,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!--10 row entries-->
         <LinearLayout
             android:id="@+id/row0"
             android:layout_width="match_parent"
@@ -34,22 +33,24 @@
                 android:textSize="36sp"
                 android:textStyle="bold"
                 android:layout_weight="1"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
 
             <EditText
-                android:id="@+id/value0"
-                android:text=""
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="36sp"
-                android:textStyle="bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal">
+                    android:id="@+id/value0"
+                    android:text=""
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="36sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    tools:ignore="Autofill, LabelFor">
 
             </EditText>
 
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/row1"
             android:layout_width="match_parent"
@@ -65,7 +66,7 @@
                 android:textSize="36sp"
                 android:textStyle="bold"
                 android:layout_weight="1"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
 
             <EditText
@@ -76,11 +77,13 @@
                 android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal">
+                android:inputType="numberDecimal"
+                tools:ignore="Autofill, LabelFor">
 
             </EditText>
 
         </LinearLayout>
+
         <LinearLayout
                 android:id="@+id/row2"
                 android:layout_width="match_parent"
@@ -96,7 +99,7 @@
                     android:textSize="36sp"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
 
             <EditText
@@ -107,11 +110,13 @@
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal">
+                    android:inputType="numberDecimal"
+                    tools:ignore="Autofill, LabelFor">
 
             </EditText>
 
         </LinearLayout>
+
         <LinearLayout
                 android:id="@+id/row3"
                 android:layout_width="match_parent"
@@ -127,7 +132,7 @@
                     android:textSize="36sp"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
 
             <EditText
@@ -138,11 +143,13 @@
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal">
+                    android:inputType="numberDecimal"
+                    tools:ignore="Autofill, LabelFor">
 
             </EditText>
 
         </LinearLayout>
+
         <LinearLayout
                 android:id="@+id/row4"
                 android:layout_width="match_parent"
@@ -158,7 +165,7 @@
                     android:textSize="36sp"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
 
             <EditText
@@ -169,11 +176,13 @@
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal">
+                    android:inputType="numberDecimal"
+                    tools:ignore="Autofill, LabelFor">
 
             </EditText>
 
         </LinearLayout>
+
         <LinearLayout
                 android:id="@+id/row5"
                 android:layout_width="match_parent"
@@ -189,7 +198,7 @@
                     android:textSize="36sp"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
 
             <EditText
@@ -200,11 +209,13 @@
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal">
+                    android:inputType="numberDecimal"
+                    tools:ignore="Autofill, LabelFor">
 
             </EditText>
 
         </LinearLayout>
+
         <LinearLayout
                 android:id="@+id/row6"
                 android:layout_width="match_parent"
@@ -220,7 +231,7 @@
                     android:textSize="36sp"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
 
             <EditText
@@ -231,11 +242,13 @@
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal">
+                    android:inputType="numberDecimal"
+                    tools:ignore="Autofill, LabelFor">
 
             </EditText>
 
         </LinearLayout>
+
         <LinearLayout
                 android:id="@+id/row7"
                 android:layout_width="match_parent"
@@ -251,7 +264,7 @@
                     android:textSize="36sp"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
 
             <EditText
@@ -262,11 +275,13 @@
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal">
+                    android:inputType="numberDecimal"
+                    tools:ignore="Autofill, LabelFor">
 
             </EditText>
 
         </LinearLayout>
+
         <LinearLayout
                 android:id="@+id/row8"
                 android:layout_width="match_parent"
@@ -282,7 +297,7 @@
                     android:textSize="36sp"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
 
             <EditText
@@ -293,11 +308,13 @@
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal">
+                    android:inputType="numberDecimal"
+                    tools:ignore="Autofill, LabelFor">
 
             </EditText>
 
         </LinearLayout>
+
         <LinearLayout
                 android:id="@+id/row9"
                 android:layout_width="match_parent"
@@ -313,7 +330,7 @@
                     android:textSize="36sp"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
 
             <EditText
@@ -324,7 +341,8 @@
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal">
+                    android:inputType="numberDecimal"
+                    tools:ignore="Autofill, LabelFor">
 
             </EditText>
 

@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainGrid: LinearLayout
     private var standardCurrency: String = DEFAULT_CURRENCY_A
     private var ignoreProgramChange: Boolean = false
+    private var lastUserChangedCurrency: Int = 0
     private var userCurrencyList = Array(MAX_NUM_CURRENCIES) {""}
     private var userCurrencyValueList = Array<BigDecimal>(MAX_NUM_CURRENCIES) {BigDecimal.valueOf(0)}
     private val currencyRates = HashMap<String, Any>()
@@ -60,9 +61,12 @@ class MainActivity : AppCompatActivity() {
             getSavedCurrencyList()
             setInputSettings()
             updateCurrencyList()
-            updateCurrencyValues(0)
+            updateCurrencyValues(lastUserChangedCurrency)
             this@MainActivity.runOnUiThread {
                 updateDisplay()
+                val valueID = resources.getIdentifier("value0", "id", packageName)
+                val valueEntry: EditText = findViewById(valueID)
+                valueEntry.setSelection(0)
             }
         }
         initES.shutdown()
@@ -76,12 +80,12 @@ class MainActivity : AppCompatActivity() {
                     userCurrencyList[i] = DEFAULT_CURRENCY_A
                     userCurrencyValueList[i] = BigDecimal(DEFAULT_VALUE)
                     updateCurrencyList()
-                    updateCurrencyValues(0) // TODO: update to currency value user last changed if possible
+                    updateCurrencyValues(lastUserChangedCurrency)
                     updateDisplay()
                 }
             }
             linearLayout.setOnLongClickListener {
-                if( userCurrencyList[i] != ADD_CURRENCY_TEXT) {
+                if(userCurrencyList[i] != ADD_CURRENCY_TEXT) { // TODO: add_currency_text also has a long-click listener (new xml, delete all button)
                     PopupMenu(linearLayout.context, linearLayout).run {
                         menuInflater.inflate(R.menu.popup_menu, menu)
                         setOnMenuItemClickListener { item ->
@@ -93,11 +97,15 @@ class MainActivity : AppCompatActivity() {
                                     userCurrencyList[i] = ""
                                     updateCurrencyList()
                                     updateDisplay()
+                                    if(lastUserChangedCurrency == i) {
+                                        lastUserChangedCurrency = 0
+                                    } else if(lastUserChangedCurrency > i) {
+                                        lastUserChangedCurrency--
+                                    }
                                 }
                                 else -> {
                                     userCurrencyList[i] = item.title.toString()
-                                    updateCurrencyValues(0) // TODO: update to currency value user last changed if possible
-                                    // TODO: if this was the one the user last changed, then its value should stay the same
+                                    updateCurrencyValues(lastUserChangedCurrency)
                                     updateDisplay()
                                     saveCurrencyList()
                                 }
@@ -125,18 +133,22 @@ class MainActivity : AppCompatActivity() {
             Log.e("Jeffrey", "Error: " + e.toString())
             if(applicationContext.getFileStreamPath(SAVED_RATES_FILE).exists()) {
                 openFileInput(SAVED_RATES_FILE).use {
-                    while (it.read() != -1) {
+                    while(it.read() != -1) {
                         var key = ""
                         var value = ""
                         val breakFlag = (-2).toByte()
-                        while (true) {
+                        while(true) {
                             val next = it.read()
-                            if (next.toByte() == breakFlag || next == -1) break
+                            if(next.toByte() == breakFlag || next == -1) {
+                                break
+                            }
                             key += next.toChar()
                         }
-                        while (true) {
+                        while(true) {
                             val next = it.read()
-                            if (next.toByte() == breakFlag || next == -1) break
+                            if(next.toByte() == breakFlag || next == -1) {
+                                break
+                            }
                             value += next.toChar()
                         }
                         currencyRates[key] = value
@@ -157,7 +169,9 @@ class MainActivity : AppCompatActivity() {
         val userList: SharedPreferences = getSharedPreferences(SAVED_USER_LIST_FILE, Context.MODE_PRIVATE)
         if(userList.contains("currency0") && userList.getString("currency0", "") != "") {
             for(i in 0 until MAX_NUM_CURRENCIES) {
-                if(userList.getString("currency$i", "") != "") userCurrencyList[i] = userList.getString("currency$i", null)
+                if(userList.getString("currency$i", "") != "") {
+                    userCurrencyList[i] = userList.getString("currency$i", null)
+                }
             }
         } else {
             userCurrencyList[0] = DEFAULT_CURRENCY_A
@@ -176,31 +190,45 @@ class MainActivity : AppCompatActivity() {
                 var cursorIndex: Int = 1
 
                 override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                    if(ignoreProgramChange || ignoreChange) return
+                    if(ignoreProgramChange || ignoreChange) {
+                        return
+                    }
                     cursorIndex = valueEntry.selectionStart
                 }
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    if(ignoreProgramChange || ignoreChange) return
+                    if(ignoreProgramChange || ignoreChange) {
+                        return
+                    }
                     cursorIndex += count - before
                     if(count > before) {
-                        if(s[0] == '0' && (start == 0 || start == 1)) cursorIndex--
+                        if(s[0] == '0' && (start == 0 || start == 1)) {
+                            cursorIndex--
+                        }
                         cursorIndex = min(cursorIndex, s.length - 1)
                     } else if(count < before) {
-                        if(s.isNotEmpty() && s[0] == '.' && start == 0) cursorIndex++
-                        else if(s.isNotEmpty() && s[0] == '0' && !s.contains('.')) cursorIndex--
+                        if(s.isNotEmpty() && s[0] == '.' && start == 0) {
+                            cursorIndex++
+                        } else if(s.isNotEmpty() && s[0] == '0' && !s.contains('.')) {
+                            cursorIndex--
+                        }
                         cursorIndex = max(0, cursorIndex)
                     }
                 }
 
                 override fun afterTextChanged(s: Editable) {
-                    if(ignoreProgramChange || ignoreChange) return
+                    if(ignoreProgramChange || ignoreChange) {
+                        return
+                    }
                     ignoreChange = true
-                    if(s.isEmpty()) s.insert(0, "0")
+                    if(s.isEmpty()) {
+                        s.insert(0, "0")
+                    }
                     currencyFormat.roundingMode = RoundingMode.DOWN
                     userCurrencyValueList[i] = currencyFormat.format(BigDecimal(s.toString())).toBigDecimal()
                     updateCurrencyValues(i)
                     updateDisplay()
+                    lastUserChangedCurrency = i
                     valueEntry.setSelection(cursorIndex)
                     ignoreChange = false
                 }
@@ -217,7 +245,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
         while(nextCurrencyIndex < userCurrencyList.size) {
-            userCurrencyList[nextCurrencyIndex] = (if(nextCurrencyIndex == 0 || !(userCurrencyList[nextCurrencyIndex - 1] == ADD_CURRENCY_TEXT || userCurrencyList[nextCurrencyIndex - 1] == "")) ADD_CURRENCY_TEXT else "")
+            userCurrencyList[nextCurrencyIndex] = if(nextCurrencyIndex == 0 || !(userCurrencyList[nextCurrencyIndex - 1] == ADD_CURRENCY_TEXT || userCurrencyList[nextCurrencyIndex - 1] == "")) {
+                ADD_CURRENCY_TEXT
+            } else {
+                ""
+            }
             userCurrencyValueList[nextCurrencyIndex++] = BigDecimal.valueOf(0)
         }
         saveCurrencyList()
@@ -259,7 +291,9 @@ class MainActivity : AppCompatActivity() {
                     valueEntry.visibility = View.VISIBLE
                 }
             }
-            if(index != -1) return
+            if(index != -1) {
+                return
+            }
         }
         ignoreProgramChange = false
     }
@@ -287,8 +321,11 @@ class MainActivity : AppCompatActivity() {
     private fun saveCurrencyList() {
         val userList: SharedPreferences.Editor = getSharedPreferences(SAVED_USER_LIST_FILE, Context.MODE_PRIVATE).edit()
         for(i in 0 until MAX_NUM_CURRENCIES) {
-            if (userCurrencyList[i] == ADD_CURRENCY_TEXT) userList.putString("currency$i", "")
-            else userList.putString("currency$i", userCurrencyList[i])
+            if(userCurrencyList[i] == ADD_CURRENCY_TEXT) {
+                userList.putString("currency$i", "")
+            } else {
+                userList.putString("currency$i", userCurrencyList[i])
+            }
         }
         userList.apply()
     }
