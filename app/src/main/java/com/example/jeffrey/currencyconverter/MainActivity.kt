@@ -269,7 +269,11 @@ class MainActivity : AppCompatActivity() {
     private fun updateDisplay(index: Int = -1) {
         ignoreProgramChange = true
         for(i in 0 until MAX_NUM_CURRENCIES) {
-            val targetIndex = if(index == -1) i else index
+            val targetIndex = if(index == -1) {
+                i
+            } else {
+                index
+            }
             val currencyID = resources.getIdentifier("currency$targetIndex", "id", packageName)
             val currencyEntry: TextView = findViewById(currencyID)
             currencyEntry.text = userCurrencyList[targetIndex]
