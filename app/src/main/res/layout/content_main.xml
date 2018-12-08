@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main"
@@ -23,7 +23,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="1"
             android:visibility="gone">
 
             <TextView
@@ -32,45 +31,16 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="36sp"
                 android:textStyle="bold"
-                android:layout_weight="1"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
-            <EditText
-                    android:id="@+id/value0"
-                    android:text=""
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textSize="36sp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    tools:ignore="Autofill, LabelFor">
-
-            </EditText>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/row1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="1"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/currency1"
-                android:text=""
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="36sp"
-                android:textStyle="bold"
-                android:layout_weight="1"
+            <View
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"/>
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
 
             <EditText
-                android:id="@+id/value1"
+                android:id="@+id/value0"
                 android:text=""
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="36sp"
@@ -78,9 +48,41 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
-                tools:ignore="Autofill, LabelFor">
+                tools:ignore="Autofill, LabelFor"/>
 
-            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+                android:id="@+id/row1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+            <TextView
+                    android:id="@+id/currency1"
+                    android:text=""
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="36sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+            <EditText
+                    android:id="@+id/value1"
+                    android:text=""
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="36sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    tools:ignore="Autofill, LabelFor"/>
 
         </LinearLayout>
 
@@ -89,7 +91,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1"
                 android:visibility="gone">
 
             <TextView
@@ -98,9 +99,13 @@
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="36sp"
                     android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
 
             <EditText
                     android:id="@+id/value2"
@@ -111,9 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    tools:ignore="Autofill, LabelFor">
-
-            </EditText>
+                    tools:ignore="Autofill, LabelFor"/>
 
         </LinearLayout>
 
@@ -122,7 +125,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1"
                 android:visibility="gone">
 
             <TextView
@@ -131,9 +133,13 @@
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="36sp"
                     android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
 
             <EditText
                     android:id="@+id/value3"
@@ -144,9 +150,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    tools:ignore="Autofill, LabelFor">
-
-            </EditText>
+                    tools:ignore="Autofill, LabelFor"/>
 
         </LinearLayout>
 
@@ -155,7 +159,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1"
                 android:visibility="gone">
 
             <TextView
@@ -164,9 +167,13 @@
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="36sp"
                     android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
 
             <EditText
                     android:id="@+id/value4"
@@ -177,9 +184,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    tools:ignore="Autofill, LabelFor">
-
-            </EditText>
+                    tools:ignore="Autofill, LabelFor"/>
 
         </LinearLayout>
 
@@ -188,7 +193,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1"
                 android:visibility="gone">
 
             <TextView
@@ -197,9 +201,13 @@
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="36sp"
                     android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
 
             <EditText
                     android:id="@+id/value5"
@@ -210,9 +218,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    tools:ignore="Autofill, LabelFor">
-
-            </EditText>
+                    tools:ignore="Autofill, LabelFor"/>
 
         </LinearLayout>
 
@@ -221,7 +227,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1"
                 android:visibility="gone">
 
             <TextView
@@ -230,9 +235,13 @@
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="36sp"
                     android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
 
             <EditText
                     android:id="@+id/value6"
@@ -243,9 +252,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    tools:ignore="Autofill, LabelFor">
-
-            </EditText>
+                    tools:ignore="Autofill, LabelFor"/>
 
         </LinearLayout>
 
@@ -254,7 +261,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1"
                 android:visibility="gone">
 
             <TextView
@@ -263,9 +269,13 @@
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="36sp"
                     android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
 
             <EditText
                     android:id="@+id/value7"
@@ -276,9 +286,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    tools:ignore="Autofill, LabelFor">
-
-            </EditText>
+                    tools:ignore="Autofill, LabelFor"/>
 
         </LinearLayout>
 
@@ -287,7 +295,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1"
                 android:visibility="gone">
 
             <TextView
@@ -296,9 +303,13 @@
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="36sp"
                     android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
 
             <EditText
                     android:id="@+id/value8"
@@ -309,9 +320,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    tools:ignore="Autofill, LabelFor">
-
-            </EditText>
+                    tools:ignore="Autofill, LabelFor"/>
 
         </LinearLayout>
 
@@ -320,7 +329,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="1"
                 android:visibility="gone">
 
             <TextView
@@ -329,9 +337,13 @@
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="36sp"
                     android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
 
             <EditText
                     android:id="@+id/value9"
@@ -342,9 +354,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    tools:ignore="Autofill, LabelFor">
-
-            </EditText>
+                    tools:ignore="Autofill, LabelFor"/>
 
         </LinearLayout>
 
