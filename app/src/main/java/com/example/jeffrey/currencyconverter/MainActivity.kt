@@ -37,7 +37,7 @@ const val DEFAULT_CURRENCY_B = "EUR"
 const val DEFAULT_VALUE = 1
 const val DELAY_TIME: Long = 5000
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() { // TODO: fix long numbers in editText getting cut off slightly on the right when scrolling
 
     private lateinit var mainGrid: LinearLayout
     private var standardCurrency: String = DEFAULT_CURRENCY_A
@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity() {
         userCurrencyValueList[0] = BigDecimal(DEFAULT_VALUE)
     }
 
-    private fun setInputSettings() {
+    private fun setInputSettings() { // TODO: fix the error where given [100.00], deleting 1 moves the cursor to |0.00 when the cursor should go to 0|.00
         for(i in 0 until MAX_NUM_CURRENCIES) {
             val valueID = resources.getIdentifier("value$i", "id", packageName)
             val valueEntry: EditText = findViewById(valueID)
@@ -315,7 +315,7 @@ class MainActivity : AppCompatActivity() {
         ignoreProgramChange = false
     }
 
-    private fun createCurrencyMenu(menu: SubMenu?) {
+    private fun createCurrencyMenu(menu: SubMenu?) { // TODO: implement searching for currencies
         if(menu != null) {
             menu.clear() // TODO: if searching is implemented as a menu item then remove the placeholder item in currency_menu.xml and remove this line
             menu.clearHeader()
