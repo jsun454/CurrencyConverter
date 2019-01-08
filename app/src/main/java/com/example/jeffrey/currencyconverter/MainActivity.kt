@@ -317,7 +317,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun createCurrencyMenu(menu: SubMenu?) {
         if(menu != null) {
-            menu.clear()
+            menu.clear() // TODO: if searching is implemented as a menu item then remove the placeholder item in currency_menu.xml and remove this line
             menu.clearHeader()
             currencyRates.forEach { (key, _) ->
                 menu.add(NONE, NONE, NONE, key.subSequence(DEFAULT_CURRENCY_A.length, key.length))

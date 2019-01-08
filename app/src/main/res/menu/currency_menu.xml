@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context="com.example.jeffrey.currencyconverter.MainActivity">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.jeffrey.currencyconverter.MainActivity">
 
     <item android:id="@+id/changeCurrencyButton"
           android:title="Change Currency"
           tools:ignore="HardcodedText">
 
           <menu>
+              <!--<item
+                  android:id="@+id/search"
+                  android:icon="@android:drawable/ic_menu_search"
+                  android:title="@android:string/search_go"
+                  app:showAsAction="always"
+                  app:actionViewClass="android.widget.SearchView"/>-->
+
               <item
-                  android:id="@+id/currencyPlaceholder"
-                  android:title="Placeholder">
-              </item>
+                      android:id="@+id/currencyPlaceholder"
+                      android:title="Placeholder"/>
           </menu>
     </item>
 
-    <item android:id="@+id/removeCurrencyButton"
-          android:title="Delete"
-          tools:ignore="HardcodedText"/>
+    <item
+        android:id="@+id/removeCurrencyButton"
+        android:title="Delete"
+        tools:ignore="HardcodedText"/>
 
 </menu>
